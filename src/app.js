@@ -69,7 +69,7 @@ app.delete("/repositories/:id", (request, response) => {
     return response.status(204).send()
 });
 
-app.post("/repositories/:id/like", (request, response) => {
+app.post("/repositories/:id/like",validateRepoId, (request, response) => {
   const{id}= request.params
   
   const likesIndex=repositories.findIndex(repository=>repository.id===id)
