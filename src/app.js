@@ -9,6 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 const repositories = [];
+let likeCount= 0
 
 function validateRepoId ( request,response,next){
   const{id}=request.params
@@ -26,7 +27,7 @@ app.get("/repositories", (request, response) => {
 });
 
 app.post("/repositories", (request, response) => {
-
+  
   const{title,url,techs}=request.body
 
   const repository={id:uuid(),title,url,techs,likes:0}
@@ -38,25 +39,27 @@ app.post("/repositories", (request, response) => {
 });
 
 app.put("/repositories/:id", (request, response) => {
-  const {id}=request.params
-  const {title,url,techs}=request.body
-  const repoIndex=repositories.findIndex(repository=>repository.id===id)
+  const {id}=request.params;
+  const {title,url,techs}=request.body;
+  const repoIndex=repositories.findIndex(repository=>repository.id===id);
 
   if(repoIndex < 0){
-    return response.json({error:"Id not found"})
+    return response.json({error:"Id not found"});
   }
+  
 
   const repository={
+    id,
     title,
     url,
-    techs
+    techs,
+    likes:0
   }
 
-  repositories[repoIndex].title=repository.title
-  repositories[repoIndex].url=repository.url
-  repositories[repoIndex].techs=repository.techs
+  repositories[repoIndex]=repository;
 
-  return response.json(repositories)
+
+  return response.json(repository)
 });
 
 app.delete("/repositories/:id", (request, response) => {
@@ -77,12 +80,11 @@ app.post("/repositories/:id/like",validateRepoId, (request, response) => {
   if (likesIndex < 0){
     return response.status(400).json({error:"Id Not Found"})
   }
-  
-  
+  likeCount += 1;
+  const repository={id, likes:likeCount}
+  repositories.push(repository)
 
-  repositories[likesIndex].likes+=1
-
-  return response.json(repositories)
+  return response.json(repository)
 
   
 });
